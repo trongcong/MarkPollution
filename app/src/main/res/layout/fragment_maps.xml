@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/textlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/Locality"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_my_location"
+            android:drawablePadding="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:text="@string/click_to_change_location" />
+
+        <EditText
+            android:id="@+id/Address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_near_me"
+            android:drawablePadding="10dp"
+            android:enabled="false"
+            android:hint="@string/address"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/locationMarkertext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#41ba2c"
+            android:ellipsize="end"
+            android:enabled="false"
+            android:gravity="center"
+            android:maxLines="1"
+            android:minWidth="250dp"
+            android:singleLine="true"
+            android:text="@string/set_your_location"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/textlayout">
+
+        <!--<fragment xmlns:tools="http://schemas.android.com/tools"-->
+        <!--android:id="@+id/map"-->
+        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--tools:context="com.project.markpollution.MainActivity"-->
+        <!--tools:layout="@layout/amu_info_window" />-->
+
+        <fragment
+            android:id="@+id/map"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.project.markpollution.MainActivity"
+            tools:layout="@layout/amu_info_window" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/imgGetLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="33sp"
+                android:contentDescription="@string/get_location_this"
+                android:src="@drawable/add_marker" />
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>

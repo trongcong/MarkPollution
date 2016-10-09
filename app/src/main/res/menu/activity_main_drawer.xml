@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/reportmanagement"
+            android:checked="false"
+            android:icon="@drawable/ic_inbox_black"
+            android:title="@string/reportmanagement" />
+
+        <item
+            android:id="@+id/seriousreport"
+            android:checked="false"
+            android:icon="@drawable/ic_star_black"
+            android:title="@string/seriousreport" />
+
+        <item
+            android:id="@+id/rencentlyreport"
+            android:checked="false"
+            android:icon="@drawable/ic_send_black"
+            android:title="@string/rencentlyreport" />
+
+        <item
+            android:id="@+id/nearbyreport"
+            android:checked="false"
+            android:icon="@drawable/ic_drafts_black"
+            android:title="@string/nearbyreport" />
+
+
+        <item
+            android:id="@+id/allreport"
+            android:checked="false"
+            android:icon="@drawable/ic_email_black"
+            android:title="@string/allreport" />
+        <item android:title="Communicate">
+            <menu>
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Share" />
+                <item
+                    android:id="@+id/action_logout"
+                    android:icon="@drawable/logout"
+                    android:title="@string/action_logout" />
+            </menu>
+        </item>
+    </group>
+
+</menu>
