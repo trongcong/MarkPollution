@@ -2,9 +2,7 @@ package com.project.markpollution;
 
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -25,12 +23,14 @@ import com.project.markpollution.Fragments.NewsFeedFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
+    ViewPagerAdapter adapter;
     private Toolbar toolbar;
     private TabLayout tabs;
-    private ViewPager viewPager;
-    private FloatingActionButton fab;
+    public ViewPager viewPager;
+//    public FloatingActionButton fab;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
+//    private double latDemo, longitDemo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tabs = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab = (FloatingActionButton) findViewById(fab);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        fab.setOnClickListener(this);
+//        fab.setOnClickListener(this);
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter=new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new NewsFeedFragment(), "NEWS FEED");
         adapter.addFragment(new MapsFragment(), "MAPS");
         viewPager.setAdapter(adapter);
@@ -86,10 +86,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab:
-                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                break;
+//            case fab:
+////                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
+////                        .setAction("Action", null).show();
+////                Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+////                i.putExtra("lat", latDemo);
+////                i.putExtra("long", longitDemo);
+////                startActivity(i);
+//
+//                if (viewPager.getCurrentItem() == 0) {
+//                    viewPager.setCurrentItem(1);
+//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+//                    startActivity(i);
+//                }else {
+//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+//                    startActivity(i);
+//                }
+//                break;
         }
     }
 

@@ -1,6 +1,7 @@
 package com.project.markpollution.Fragments;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -23,16 +25,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,9 +43,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.project.markpollution.CustomAdapter.AppUtils;
 import com.project.markpollution.CustomAdapter.FetchAddressIntentService;
 import com.project.markpollution.R;
+import com.project.markpollution.SubmitMarkPollutionActivity;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static com.project.markpollution.R.id.map;
 
 /**
  * IDE: Android Studio
@@ -57,7 +59,7 @@ import static android.app.Activity.RESULT_OK;
 public class MapsFragment extends Fragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener {
+        LocationListener, View.OnClickListener {
 
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -75,6 +77,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     ImageView imgGetLocation;
     EditText mLocationAddress;
     TextView mLocationText;
+    SupportMapFragment mapFragment;
+    private FloatingActionButton fabCheck;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLng mCenterLatLong;
@@ -93,38 +97,30 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 //        super.onAttach(activity);
 //    }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+//        ((MainActivity) this.getActivity()).fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (((MainActivity) getActivity()).viewPager.getCurrentItem() == 1) {
+//                    ((MainActivity) getActivity()).viewPager.setCurrentItem(0);
+//                }
+//
+//            }
+//        });
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
-        View v = inflater.inflate(R.layout.fragment_maps, container, false);
-        imgGetLocation = (ImageView) v.findViewById(R.id.imgGetLocation);
-        imgGetLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), mAddressOutput, Toast.LENGTH_LONG).show();
-            }
-        });
-
+        View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        initView(rootView);
         mContext = getActivity();
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
-                .findFragmentById(R.id.map);
-
-        mLocationMarkerText = (TextView) v.findViewById(R.id.locationMarkertext);
-        mLocationAddress = (EditText) v.findViewById(R.id.Address);
-        mLocationText = (TextView) v.findViewById(R.id.Locality);
-        mLocationText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openAutocompleteActivity();
-            }
-        });
-        mapFragment.getMapAsync(this);
         mResultReceiver = new AddressResultReceiver(new Handler());
 
         if (checkPlayServices()) {
@@ -157,15 +153,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         } else {
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
-        return v;
+        return rootView;
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(mContext,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
 
@@ -221,6 +217,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+//    public abstract void demo(double lat, double longi);
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "OnMapReady");
@@ -240,15 +238,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                     startIntentService(mLocation);
                     mLocationMarkerText.setText("Lat : " + mCenterLatLong.latitude
                             + ", Long : " + mCenterLatLong.longitude);
-
+//lấy lat long chỗ này đi
+                    //  demo(1.2, 2.3);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        if (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -271,7 +270,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addConnectionCallbacks(this)
@@ -285,7 +283,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         super.onStart();
         try {
             mGoogleApiClient.connect();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -295,7 +292,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     public void onStop() {
         super.onStop();
         try {
-
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
@@ -318,13 +314,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         return true;
     }
 
-
     private void changeMap(Location location) {
         Log.d(TAG, "Reaching map" + mMap);
 
-        if (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -343,15 +338,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             latLong = new LatLng(location.getLatitude(), location.getLongitude());
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(latLong).zoom(19f).tilt(70).build();
+                    .target(latLong).zoom(17f).tilt(45).build();
 
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(cameraPosition));
-
-            mLocationMarkerText.setText("Lat : " + location.getLatitude()
-                    + ", Long : " + location.getLongitude());
+//TODO: Lat Long after change
+            mLocationMarkerText.setText("Lat change : " + location.getLatitude()
+                    + ", Long change : " + location.getLongitude());
             startIntentService(location);
         } else {
             Toast.makeText(mContext,
@@ -370,7 +365,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                 mLocationText.setText(mAreaOutput + "");
 
             mLocationAddress.setText(mAddressOutput);
-//            mLocationText.setText(mAreaOutput);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -397,131 +391,157 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void openAutocompleteActivity() {
-        try {
-            // The autocomplete activity requires Google Play Services to be available. The intent
-            // builder checks this and throws an exception if it is not the case.
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-                    .build(getActivity());
-            startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
-        } catch (GooglePlayServicesRepairableException e) {
-            // Indicates that Google Play Services is either not installed or not up to date. Prompt
-            // the user to correct the issue.
-            GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.getConnectionStatusCode(),
-                    0 /* requestCode */).show();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            // Indicates that Google Play Services is not available and the problem is not easily
-            // resolvable.
-            String message = "Google Play Services is not available: " +
-                    GoogleApiAvailability.getInstance().getErrorString(e.errorCode);
-
-            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-        }
+//        try {
+//            // The autocomplete activity requires Google Play Services to be available. The intent
+//            // builder checks this and throws an exception if it is not the case.
+//            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+//                    .build(getActivity());
+//            startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+//        } catch (GooglePlayServicesRepairableException e) {
+//            // Indicates that Google Play Services is either not installed or not up to date. Prompt
+//            // the user to correct the issue.
+//            GoogleApiAvailability.getInstance().getErrorDialog(getActivity(), e.getConnectionStatusCode(),
+//                    0 /* requestCode */).show();
+//        } catch (GooglePlayServicesNotAvailableException e) {
+//            // Indicates that Google Play Services is not available and the problem is not easily
+//            // resolvable.
+//            String message = "Google Play Services is not available: " +
+//                    GoogleApiAvailability.getInstance().getErrorString(e.errorCode);
+//
+//            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+//        }
 
         //TODO: try catch PlacePicker
-/**
- //        try {
- //            PlacePicker.IntentBuilder intentBuilder =
- //                    new PlacePicker.IntentBuilder();
- //            Intent intent = intentBuilder.build(getActivity());
- //            // Start the intent by requesting a result,
- //            // identified by a request code.
- //            startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
- //
- //        } catch (GooglePlayServicesRepairableException e) {
- //            // ...
- //        } catch (GooglePlayServicesNotAvailableException e) {
- //            // ...
- //        }
 
- */
+        try {
+            PlacePicker.IntentBuilder intentBuilder =
+                    new PlacePicker.IntentBuilder();
+            Intent intent = intentBuilder.build(getActivity());
+            // Start the intent by requesting a result,
+            // identified by a request code.
+            startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            // ...
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // ...
+        }
     }
 
 //TODO: PlacePicker onActivityResult
 
-    /**
-     * //    @Override
-     * //    public void onActivityResult(int requestCode,
-     * //                                 int resultCode, Intent data) {
-     * //
-     * //        if (requestCode == REQUEST_CODE_AUTOCOMPLETE
-     * //                && resultCode == RESULT_OK) {
-     * //
-     * //            // The user has selected a place. Extract the name and address.
-     * //            final Place place = PlacePicker.getPlace(mContext,data);
-     * //
-     * //            Log.d(TAG, place.toString()+"");
-     * //            // TODO call location based filter
-     * //            LatLng latLong;
-     * //            latLong = place.getLatLng();
-     * //
-     * //            //mLocationText.setText(place.getName() + "");
-     * //
-     * //            CameraPosition cameraPosition = new CameraPosition.Builder()
-     * //                    .target(latLong).zoom(19f).tilt(70).build();
-     * //
-     * //            if (ActivityCompat.checkSelfPermission(mContext,
-     * //                    android.Manifest.permission.ACCESS_FINE_LOCATION)
-     * //                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
-     * //                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-     * //                // TODO: Consider calling
-     * //                return;
-     * //            }
-     * //            mMap.setMyLocationEnabled(true);
-     * //            mMap.animateCamera(CameraUpdateFactory
-     * //                    .newCameraPosition(cameraPosition));
-     * //        } else {
-     * //            super.onActivityResult(requestCode, resultCode, data);
-     * //        }
-     * //    }
-     */
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_AUTOCOMPLETE && resultCode == RESULT_OK) {
+            // The user has selected a place. Extract the name and address.
+            final Place place = PlacePicker.getPlace(mContext, data);
+            Log.d(TAG, place.toString() + "");
+            // TODO call location based filter
+            LatLng latLong;
+            latLong = place.getLatLng();
 
-        // Check that the result was from the autocomplete widget.
-        if (requestCode == REQUEST_CODE_AUTOCOMPLETE) {
-            if (resultCode == RESULT_OK) {
-                // Get the user's selected place from the Intent.
-                Place place = PlaceAutocomplete.getPlace(mContext, data);
-//TODO: Log
-                Log.d(TAG, place.toString() + "");
-                // TODO call location based filter
-                LatLng latLong;
-                latLong = place.getLatLng();
+//            mLocationText.setText(place.getName() + "");
 
-                //mLocationText.setText(place.getName() + "");
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLong).zoom(17f).tilt(45).build();
 
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(latLong).zoom(19f).tilt(70).build();
+//            tilt --> độ nghiêng của maps
+//            CameraPosition cameraPosition = new CameraPosition.Builder()
+//                    .target(latLong).zoom(17f).tilt(70).build();
 
-                if (ActivityCompat.checkSelfPermission(mContext,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mMap.setMyLocationEnabled(true);
-                mMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(cameraPosition));
+            if (ActivityCompat.checkSelfPermission(mContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                return;
             }
-
-        } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-            Status status = PlaceAutocomplete.getStatus(mContext, data);
-            // TODO: Handle the error.
-            Log.i(TAG, status.getStatusMessage());
-        } else if (resultCode == RESULT_CANCELED) {
-            // Indicates that the activity closed before a selection was made. For example if
-            // the user pressed the back button.
+            mMap.setMyLocationEnabled(true);
+            mMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(cameraPosition));
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+    private void initView(View rootView) {
+        mLocationMarkerText = (TextView) rootView.findViewById(R.id.locationMarkertext);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+                .findFragmentById(map);
+        fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
+        mLocationAddress = (EditText) rootView.findViewById(R.id.Address);
+        mLocationText = (TextView) rootView.findViewById(R.id.Locality);
+        imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
+
+        imgGetLocation.setOnClickListener(this);
+        mLocationText.setOnClickListener(this);
+        mapFragment.getMapAsync(this);
+        fabCheck.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fabCheck:
+                startActivity(new Intent(mContext, SubmitMarkPollutionActivity.class));
+                break;
+            case R.id.Locality:
+                openAutocompleteActivity();
+                break;
+            case R.id.imgGetLocation:
+                Toast.makeText(getContext(), mAddressOutput, Toast.LENGTH_LONG).show();
+                break;
+        }
+    }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        // Check that the result was from the autocomplete widget.
+//        if (requestCode == REQUEST_CODE_AUTOCOMPLETE) {
+//            if (resultCode == RESULT_OK) {
+//                // Get the user's selected place from the Intent.
+//                Place place = PlaceAutocomplete.getPlace(mContext, data);
+////TODO: Log
+//                Log.d(TAG, place.toString() + "");
+//                // TODO call location based filter
+//                LatLng latLong;
+//                latLong = place.getLatLng();
+//
+//                //mLocationText.setText(place.getName() + "");
+//
+//                CameraPosition cameraPosition = new CameraPosition.Builder()
+//                        .target(latLong).zoom(19f).tilt(70).build();
+//
+//                if (ActivityCompat.checkSelfPermission(mContext,
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    // TODO: Consider calling
+//                    //    ActivityCompat#requestPermissions
+//                    // here to request the missing permissions, and then overriding
+//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                    //                                          int[] grantResults)
+//                    // to handle the case where the user grants the permission. See the documentation
+//                    // for ActivityCompat#requestPermissions for more details.
+//                    return;
+//                }
+//                mMap.setMyLocationEnabled(true);
+//                mMap.animateCamera(CameraUpdateFactory
+//                        .newCameraPosition(cameraPosition));
+//            }
+//
+//        } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+//            Status status = PlaceAutocomplete.getStatus(mContext, data);
+//            // TODO: Handle the error.
+//            Log.i(TAG, status.getStatusMessage());
+//        } else if (resultCode == RESULT_CANCELED) {
+//            // Indicates that the activity closed before a selection was made. For example if
+//            // the user pressed the back button.
+//        }
+//    }
 
     /**
      * Called after the autocomplete activity has finished to return its result.
@@ -541,22 +561,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-
             // Display the address string or an error message sent from the intent service.
             mAddressOutput = resultData.getString(AppUtils.LocationConstants.RESULT_DATA_KEY);
-
             mAreaOutput = resultData.getString(AppUtils.LocationConstants.LOCATION_DATA_AREA);
-
             mCityOutput = resultData.getString(AppUtils.LocationConstants.LOCATION_DATA_CITY);
             mStateOutput = resultData.getString(AppUtils.LocationConstants.LOCATION_DATA_STREET);
-
             displayAddressOutput();
-
             // Show a toast message if an address was found.
             if (resultCode == AppUtils.LocationConstants.SUCCESS_RESULT) {
                 //  showToast(getString(R.string.address_found));
-
-
             }
         }
     }

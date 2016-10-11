@@ -22,4 +22,9 @@
     <string name="set_your_location">Set your Location</string>
     <string name="address">Address</string>
     <string name="click_to_change_location">Click to change location</string>
+    <string name="submit">Submit</string>
+    <string name="category">Category</string>
+    <string name="enter_description">Enter Description</string>
+    <string name="enter_title">Enter title</string>
+    <string name="imageview">ImageView</string>
 </resources>
