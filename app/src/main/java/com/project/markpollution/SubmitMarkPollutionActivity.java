@@ -46,6 +46,7 @@ public class SubmitMarkPollutionActivity extends AppCompatActivity implements On
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(c, 17));
         mMap.getUiSettings().setAllGesturesEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
 
     }
 }

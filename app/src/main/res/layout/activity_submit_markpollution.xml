@@ -3,67 +3,49 @@
     xmlns:maps="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <fragment
-            android:id="@+id/mapss"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            maps:mapType="normal" />
+        android:layout_height="match_parent"
+        android:background="#FFF"
+        android:orientation="vertical"
+        android:weightSum="10">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
+            android:layout_height="0dp"
+            android:layout_margin="5dp"
+            android:layout_weight="3"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="2">
+
+            <fragment
+                android:id="@+id/mapss"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                maps:mapType="normal" />
 
             <ImageView
                 android:layout_width="0dp"
-                android:layout_height="70dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:contentDescription="@string/imageview"
-                android:src="@mipmap/ic_launcher" />
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/imageview"
-                android:src="@mipmap/ic_launcher" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/imageview"
-                android:src="@mipmap/ic_launcher" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_weight="1"
-                android:contentDescription="@string/imageview"
                 android:src="@mipmap/ic_launcher" />
         </LinearLayout>
 
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="1.1">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_near_me"
                 android:drawablePadding="5dp"
                 android:hint="@string/enter_title"
                 android:inputType="text"
@@ -71,16 +53,15 @@
 
         </android.support.design.widget.TextInputLayout>
 
-
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="1.1">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/tvCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_near_me"
                 android:drawablePadding="5dp"
                 android:hint="@string/category"
                 android:inputType="text"
@@ -89,41 +70,32 @@
         </android.support.design.widget.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/tvDescription"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|left"
-            android:hint="@string/enter_description"
-            android:inputType="text"
-            android:maxHeight="200dp"
-            android:minHeight="100dp"
-            android:padding="5dp"
-            tools:ignore="RtlHardcoded" />
+            android:layout_height="0dp"
+            android:layout_weight="3.8"
+            android:fillViewport="true">
 
+            <EditText
+                android:id="@+id/edNoiDung"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|left"
+                android:hint="Nhập vào nội dung mô tả cần gửi..."
+                android:maxHeight="250dp"
+                android:minHeight="150dp"
+                android:paddingBottom="0dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp" />
+        </ScrollView>
 
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="1"
             android:text="@string/submit" />
-        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
-        <!--android:id="@+id/mapss"-->
-        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--map:cameraBearing="112.5"-->
-        <!--map:cameraTargetLat="-33.796923"-->
-        <!--map:cameraTargetLng="150.922433"-->
-        <!--map:cameraTilt="30"-->
-        <!--map:cameraZoom="13"-->
-        <!--map:mapType="normal"-->
-        <!--map:uiCompass="false"-->
-        <!--map:uiRotateGestures="true"-->
-        <!--map:uiScrollGestures="false"-->
-        <!--map:uiTiltGestures="true"-->
-        <!--map:uiZoomControls="false"-->
-        <!--map:uiZoomGestures="true" />-->
+
     </LinearLayout>
 </ScrollView>
