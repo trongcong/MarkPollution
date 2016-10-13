@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.project.markpollution.Fragments.MapsFragment;
 import com.project.markpollution.R;
 
 /**
@@ -21,6 +22,7 @@ import com.project.markpollution.R;
  */
 public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
     Context context;
+
 
     public MapsAdapter(Context context) {
         this.context = context;
@@ -40,16 +42,24 @@ public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
         // Getting the position from the marker
         LatLng latLng = marker.getPosition();
         // Getting reference to the TextView to set latitude
-        TextView tvLat = (TextView) v.findViewById(R.id.tvLat);
+        TextView tvTitle = (TextView) v.findViewById(R.id.tvTitle);
         // Getting reference to the TextView to set longitude
-        TextView tvLng = (TextView) v.findViewById(R.id.tvLng);
+        TextView tvDes = (TextView) v.findViewById(R.id.tvDes);
 
-        ImageView imgMaker=(ImageView) v.findViewById(R.id.imgMaker) ;
-//        imgMaker.setImageBitmap();
-        // Setting the latitude
-        tvLat.setText("Latitude:" + latLng.latitude);
-        // Setting the longitude
-        tvLng.setText("Longitude:" + latLng.longitude);
+        ImageView imgMaker = (ImageView) v.findViewById(R.id.imgMaker);
+//        for (LocationObj l : MapsFragment.list) {
+//            imgMaker.setImageResource(l.getImage());
+//            tvTitle.setText(l.getTitle());
+//            tvDes.setText(l.getDesc());
+//        }
+        for (int i = 0; i < MapsFragment.list.size(); i++) {
+            imgMaker.setImageResource(MapsFragment.list.get(i).getImage());
+            tvTitle.setText(MapsFragment.list.get(i).getTitle());
+            tvDes.setText(MapsFragment.list.get(i).getDesc());
+        }
+//        tvTitle.setText(latLng.latitude+"");
+//        tvDes.setText(latLng.longitude+"");
+
         return v;
     }
 }

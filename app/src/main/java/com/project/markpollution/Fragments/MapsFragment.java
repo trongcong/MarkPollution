@@ -34,8 +34,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.project.markpollution.CustomAdapter.MapsAdapter;
+import com.project.markpollution.ModelObject.LocationObj;
 import com.project.markpollution.R;
 import com.project.markpollution.SubmitMarkPollutionActivity;
+
+import java.util.ArrayList;
 
 
 /**
@@ -51,6 +56,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, View.OnClickListener {
 
+    public static ArrayList<LocationObj> list = new ArrayList<>();
     Context mContext;
     ImageView imgGetLocation;
     SupportMapFragment mapFragment;
@@ -81,12 +87,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("Fragment Demo", "Fragment_Maps onCreate()");
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
         initView(rootView);
+
+        demoData();
+
         mContext = getActivity();
 //        mResultReceiver = new AddressResultReceiver(new Handler());
         if (checkPlayServices()) {
@@ -99,6 +109,67 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
         return rootView;
+    }
+
+    private void initView(View rootView) {
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
+        imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
+
+        imgGetLocation.setOnClickListener(this);
+        mapFragment.getMapAsync(this);
+        fabCheck.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fabCheck:
+                Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
+                i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
+                i.putExtra("Long", mMap.getCameraPosition().target.longitude);
+                startActivity(i);
+                break;
+            case R.id.imgGetLocation:
+                Toast.makeText(getContext(), mMap.getCameraPosition().target.latitude
+                        + " - " + mMap.getCameraPosition().target.longitude, Toast.LENGTH_LONG).show();
+                break;
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        for (LocationObj l : list) {
+            setMaket(l);
+        }
+//        mMap.addMarker(new MarkerOptions().position(new LatLng(21.02776,105.83415)).title("abcxyz"));
+//        mMap.setInfoWindowAdapter(new MapsAdapter(mContext));
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(mContext, "Ứng dụng chưa cấp quyền tìm vị trí !!!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnCameraIdleListener(this);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+    }
+
+    void setMaket(LocationObj obj) {
+        LatLng sydney = new LatLng(obj.getLatitude(), obj.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
+        mMap.setInfoWindowAdapter(new MapsAdapter(mContext));
+
+    }
+
+    void demoData() {
+        list.add(new LocationObj("Title 1", "Description 1", R.drawable.admin, 21.027763544534345, 105.834158398211));
+        list.add(new LocationObj("Title 2", "Description 2", R.drawable.admin, 21.027489088033935, 105.83488393574953));
+        list.add(new LocationObj("Title 3", "Description 3", R.drawable.admin, 21.027214005127888, 105.83561684936285));
+        list.add(new LocationObj("Title 4", "Description 4", R.drawable.admin, 21.027931910985746, 105.83607684820892));
+
     }
 
     // Gọi khi người dùng có kết nối từ GoogleApiClient
@@ -161,18 +232,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         }
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(mContext, "Ứng dụng chưa cấp quyền tìm vị trí !!!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        mMap.setMyLocationEnabled(true);
-        mMap.setOnCameraIdleListener(this);
-    }
 
     // synchronized: đồng bộ hóa, -- gọi nhiều nơi, cùng lúc (google)
     protected synchronized void buildGoogleApiClient() {
@@ -231,7 +290,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         // check if map is created successfully or not
         if (mMap != null) {
             LatLng latLong = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(latLong).zoom(19f).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(latLong).zoom(17f).build();
 
             mMap.setMyLocationEnabled(true);
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -250,28 +309,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         );
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fabCheck:
-                startActivity(new Intent(mContext, SubmitMarkPollutionActivity.class));
-                break;
-            case R.id.imgGetLocation:
-                Toast.makeText(getContext(), mMap.getCameraPosition().target.latitude
-                        + " - " + mMap.getCameraPosition().target.longitude, Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
-
-    private void initView(View rootView) {
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
-        fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
-        imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
-
-        imgGetLocation.setOnClickListener(this);
-        mapFragment.getMapAsync(this);
-        fabCheck.setOnClickListener(this);
-    }
 
     // Dialog yêu cầu kích hoạt GPS
     private void openDiaLogCheckGPS() {

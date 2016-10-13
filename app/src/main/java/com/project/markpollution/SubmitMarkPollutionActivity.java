@@ -1,8 +1,10 @@
 package com.project.markpollution;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +34,7 @@ public class SubmitMarkPollutionActivity extends AppCompatActivity implements On
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapss);
 
+
         mapFragment.getMapAsync(this);
 
     }
@@ -40,8 +43,13 @@ public class SubmitMarkPollutionActivity extends AppCompatActivity implements On
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        Intent i = getIntent();
+        double lat = i.getDoubleExtra("Lat", 0);
+        double log = i.getDoubleExtra("Long", 0);
+        Log.i("Lat long: ", lat + " - " + log);
+
         // Add a marker in Sydney and move the camera
-        LatLng c = new LatLng(16.0756732,108.1698878);
+        LatLng c = new LatLng(lat, log);
         mMap.addMarker(new MarkerOptions().position(c).title("This is Mark Pollution ")).showInfoWindow();
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(c, 17));
