@@ -30,13 +30,10 @@ public class SubmitMarkPollutionActivity extends AppCompatActivity implements On
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submit_markpollution);
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapss);
 
-
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -48,7 +45,6 @@ public class SubmitMarkPollutionActivity extends AppCompatActivity implements On
         double log = i.getDoubleExtra("Long", 0);
         Log.i("Lat long: ", lat + " - " + log);
 
-        // Add a marker in Sydney and move the camera
         LatLng c = new LatLng(lat, log);
         mMap.addMarker(new MarkerOptions().position(c).title("This is Mark Pollution ")).showInfoWindow();
 

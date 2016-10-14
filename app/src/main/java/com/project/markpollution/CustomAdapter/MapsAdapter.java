@@ -1,6 +1,7 @@
 package com.project.markpollution.CustomAdapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,8 +10,10 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.project.markpollution.Fragments.MapsFragment;
+import com.project.markpollution.ModelObject.LocationObj;
 import com.project.markpollution.R;
+
+import java.util.ArrayList;
 
 /**
  * IDE: Android Studio
@@ -22,10 +25,11 @@ import com.project.markpollution.R;
  */
 public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
     Context context;
+    ArrayList<LocationObj> arrL;
 
-
-    public MapsAdapter(Context context) {
+    public MapsAdapter(Context context, ArrayList<LocationObj> arrL) {
         this.context = context;
+        this.arrL = arrL;
     }
 
     @Override
@@ -35,31 +39,33 @@ public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
+        return prepareInfoView(marker);
+    }
+
+    private View prepareInfoView(Marker marker) {
         // Getting view from the layout file custom_info_window4
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View v = inflater.inflate(R.layout.custom_info_window, null);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View rootView = inflater.inflate(R.layout.custom_info_window, null);
         // Getting the position from the marker
         LatLng latLng = marker.getPosition();
-        // Getting reference to the TextView to set latitude
-        TextView tvTitle = (TextView) v.findViewById(R.id.tvTitle);
-        // Getting reference to the TextView to set longitude
-        TextView tvDes = (TextView) v.findViewById(R.id.tvDes);
+        // Getting reference to the TextView to set Title
+        TextView tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
+        // Getting reference to the TextView to set Des
+        TextView tvDes = (TextView) rootView.findViewById(R.id.tvDes);
+        ImageView imgMaker = (ImageView) rootView.findViewById(R.id.imgMaker);
 
-        ImageView imgMaker = (ImageView) v.findViewById(R.id.imgMaker);
-//        for (LocationObj l : MapsFragment.list) {
-//            imgMaker.setImageResource(l.getImage());
-//            tvTitle.setText(l.getTitle());
-//            tvDes.setText(l.getDesc());
-//        }
-        for (int i = 0; i < MapsFragment.list.size(); i++) {
-            imgMaker.setImageResource(MapsFragment.list.get(i).getImage());
-            tvTitle.setText(MapsFragment.list.get(i).getTitle());
-            tvDes.setText(MapsFragment.list.get(i).getDesc());
+        for (LocationObj l : arrL) {
+            if (l.getLatitude() == latLng.latitude & l.getLongitude() == latLng.longitude) {
+                tvTitle.setText(l.getTitle() + " Lat: " + l.getLatitude());
+                Log.i("title", l.getTitle() + " Lat: " + l.getLatitude());
+                tvDes.setText(l.getDesc() + " Long: " + l.getLongitude());
+                Log.i("desc", l.getDesc() + " Long: " + l.getLongitude());
+                imgMaker.setImageResource(l.getImage());
+                Log.i("image", l.getImage() + "");
+            }
         }
 //        tvTitle.setText(latLng.latitude+"");
 //        tvDes.setText(latLng.longitude+"");
-
-        return v;
+        return rootView;
     }
 }

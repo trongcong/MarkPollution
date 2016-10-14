@@ -42,7 +42,6 @@ import com.project.markpollution.SubmitMarkPollutionActivity;
 
 import java.util.ArrayList;
 
-
 /**
  * IDE: Android Studio
  * Created by Nguyen Trong Cong  - 2DEV4U.COM
@@ -56,7 +55,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener, View.OnClickListener {
 
-    public static ArrayList<LocationObj> list = new ArrayList<>();
+    public ArrayList<LocationObj> listL;
+
     Context mContext;
     ImageView imgGetLocation;
     SupportMapFragment mapFragment;
@@ -93,12 +93,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        mContext = getActivity();
         initView(rootView);
 
-        demoData();
 
-        mContext = getActivity();
-//        mResultReceiver = new AddressResultReceiver(new Handler());
+
         if (checkPlayServices()) {
             if (!isLocationEnabled(mContext)) {
                 openDiaLogCheckGPS();
@@ -108,6 +107,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         } else {
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
+        demoData();
         return rootView;
     }
 
@@ -140,11 +140,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        for (LocationObj l : list) {
+        for (LocationObj l : listL) {
             setMaket(l);
         }
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(21.02776,105.83415)).title("abcxyz"));
-//        mMap.setInfoWindowAdapter(new MapsAdapter(mContext));
+
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -152,24 +151,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             return;
         }
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setOnCameraIdleListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
     void setMaket(LocationObj obj) {
         LatLng sydney = new LatLng(obj.getLatitude(), obj.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.addMarker(new MarkerOptions().position(sydney));
+        MapsAdapter mapsAdapter = new MapsAdapter(mContext, listL);
+        mMap.setInfoWindowAdapter(mapsAdapter);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
-        mMap.setInfoWindowAdapter(new MapsAdapter(mContext));
 
     }
 
     void demoData() {
-        list.add(new LocationObj("Title 1", "Description 1", R.drawable.admin, 21.027763544534345, 105.834158398211));
-        list.add(new LocationObj("Title 2", "Description 2", R.drawable.admin, 21.027489088033935, 105.83488393574953));
-        list.add(new LocationObj("Title 3", "Description 3", R.drawable.admin, 21.027214005127888, 105.83561684936285));
-        list.add(new LocationObj("Title 4", "Description 4", R.drawable.admin, 21.027931910985746, 105.83607684820892));
-
+        listL = new ArrayList<>();
+        listL.add(new LocationObj("Title 1", "Description 1", R.drawable.admin, 21.027763544534345, 105.834158398211));
+        listL.add(new LocationObj("Title 2", "Description 2", R.drawable.add_marker, 21.027489088033935, 105.83488393574953));
+        listL.add(new LocationObj("Title 3", "Description 3", R.drawable.background_material, 21.027214005127888, 105.83561684936285));
+        listL.add(new LocationObj("Title 4", "Description 4", R.drawable.logout, 21.027931910985746, 105.83607684820892));
+        listL.add(new LocationObj("Title 5", "Description 5", R.drawable.ic_email_black, 21.02871709699915, 105.83497546613216));
     }
 
     // Gọi khi người dùng có kết nối từ GoogleApiClient
@@ -293,6 +295,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             CameraPosition cameraPosition = new CameraPosition.Builder().target(latLong).zoom(17f).build();
 
             mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             Toast.makeText(mContext, location.getLatitude() + " - " + location.getLongitude(), Toast.LENGTH_LONG).show();
