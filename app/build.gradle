@@ -37,6 +37,8 @@ dependencies {
     // Hỗ trợ gom marker khi phóng to thu nhỏ bản đồ
     compile 'com.google.maps.android:android-maps-utils:0.4.+'
 
-    // Static maps api android
-//    compile 'com.github.renaudcerrato:static-maps-api:1.0.2'
+    compile 'com.google.android.gms:play-services-auth:9.6.1'
+    compile 'nl.stevenhack.volley:library:1.0.2'
 }
+
+apply plugin: 'com.google.gms.google-services'

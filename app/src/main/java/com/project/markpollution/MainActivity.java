@@ -1,6 +1,10 @@
 package com.project.markpollution;
 
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -13,11 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.markpollution.CustomAdapter.ViewPagerAdapter;
 import com.project.markpollution.Fragments.MapsFragment;
 import com.project.markpollution.Fragments.NewsFeedFragment;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity
@@ -27,10 +37,8 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private TabLayout tabs;
     public ViewPager viewPager;
-//    public FloatingActionButton fab;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
-//    private double latDemo, longitDemo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +55,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initView() {
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
         tabs = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-//        fab = (FloatingActionButton) findViewById(fab);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -61,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-//        fab.setOnClickListener(this);
+        setNavigationHeader();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -82,6 +88,47 @@ public class MainActivity extends AppCompatActivity
 //        tabs.getTabAt(0).setIcon(tabIcons[0]);
 //        tabs.getTabAt(1).setIcon(tabIcons[1]);
 //    }
+
+    private void setNavigationHeader(){
+        View view = navigationView.getHeaderView(0);
+        TextView tvNavName = (TextView) view.findViewById(R.id.username);
+        TextView tvNavEmail = (TextView) view.findViewById(R.id.email);
+        ImageView ivNavAvatar = (ImageView) view.findViewById(R.id.profile_image);
+
+        Intent intent = getIntent();
+        String name = intent.getStringExtra("name");
+        String email = intent.getStringExtra("email");
+        String avatar = intent.getStringExtra("avatar");
+        tvNavName.setText(name);
+        tvNavEmail.setText(email);
+        new getAvatar(ivNavAvatar).execute(avatar);
+    }
+
+    private class getAvatar extends AsyncTask<String, Void, Bitmap> {
+        ImageView imageView;
+
+        public getAvatar(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String url = params[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream inputStream = new URL(url).openStream();
+                bitmap = BitmapFactory.decodeStream(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
 
     @Override
     public void onClick(View v) {
