@@ -46,26 +46,20 @@ public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
         // Getting view from the layout file custom_info_window4
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rootView = inflater.inflate(R.layout.custom_info_window, null);
+        // Getting reference to the tv & iv
+        TextView tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
+        TextView tvDes = (TextView) rootView.findViewById(R.id.tvDes);
+        ImageView imgMarker = (ImageView) rootView.findViewById(R.id.imgMarker);
         // Getting the position from the marker
         LatLng latLng = marker.getPosition();
-        // Getting reference to the TextView to set Title
-        TextView tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
-        // Getting reference to the TextView to set Des
-        TextView tvDes = (TextView) rootView.findViewById(R.id.tvDes);
-        ImageView imgMaker = (ImageView) rootView.findViewById(R.id.imgMaker);
 
         for (LocationObj l : arrL) {
-            if (l.getLatitude() == latLng.latitude & l.getLongitude() == latLng.longitude) {
-                tvTitle.setText(l.getTitle() + " Lat: " + l.getLatitude());
-                Log.i("title", l.getTitle() + " Lat: " + l.getLatitude());
-                tvDes.setText(l.getDesc() + " Long: " + l.getLongitude());
-                Log.i("desc", l.getDesc() + " Long: " + l.getLongitude());
-                imgMaker.setImageResource(l.getImage());
-                Log.i("image", l.getImage() + "");
+            if (l.getLatitude() == latLng.latitude && l.getLongitude() == latLng.longitude) {
+                tvTitle.setText(l.getTitle());
+                tvDes.setText(l.getDesc());
+                imgMarker.setImageResource(l.getImage());
             }
         }
-//        tvTitle.setText(latLng.latitude+"");
-//        tvDes.setText(latLng.longitude+"");
         return rootView;
     }
 }

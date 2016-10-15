@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SubmitMarkPollutionActivity"
+            android:name=".SubmitPollutionPointActivity"
             android:label="Submit Mark Pollution "></activity>
 
     </application>

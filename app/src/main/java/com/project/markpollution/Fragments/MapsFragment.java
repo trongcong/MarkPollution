@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -38,7 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.markpollution.CustomAdapter.MapsAdapter;
 import com.project.markpollution.ModelObject.LocationObj;
 import com.project.markpollution.R;
-import com.project.markpollution.SubmitMarkPollutionActivity;
+import com.project.markpollution.SubmitPollutionPointActivity;
 
 import java.util.ArrayList;
 
@@ -96,8 +97,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mContext = getActivity();
         initView(rootView);
 
-
-
         if (checkPlayServices()) {
             if (!isLocationEnabled(mContext)) {
                 openDiaLogCheckGPS();
@@ -116,7 +115,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
         imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
 
-        imgGetLocation.setOnClickListener(this);
         mapFragment.getMapAsync(this);
         fabCheck.setOnClickListener(this);
     }
@@ -125,14 +123,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabCheck:
-                Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
-                i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
-                i.putExtra("Long", mMap.getCameraPosition().target.longitude);
-                startActivity(i);
-                break;
-            case R.id.imgGetLocation:
-                Toast.makeText(getContext(), mMap.getCameraPosition().target.latitude
-                        + " - " + mMap.getCameraPosition().target.longitude, Toast.LENGTH_LONG).show();
+                Snackbar.make(v, "Mark pollution point and click OK", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent i = new Intent(mContext, SubmitPollutionPointActivity.class);
+                                i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
+                                i.putExtra("Long", mMap.getCameraPosition().target.longitude);
+                                startActivity(i);
+                            }
+                        }).show();
                 break;
         }
     }
@@ -141,7 +141,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         for (LocationObj l : listL) {
-            setMaket(l);
+            setMarker(l);
         }
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -156,12 +156,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
-    void setMaket(LocationObj obj) {
-        LatLng sydney = new LatLng(obj.getLatitude(), obj.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(sydney));
+    void setMarker(LocationObj obj) {
+        LatLng point = new LatLng(obj.getLatitude(), obj.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(point));
         MapsAdapter mapsAdapter = new MapsAdapter(mContext, listL);
         mMap.setInfoWindowAdapter(mapsAdapter);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 17));
 
     }
 
@@ -238,8 +238,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     // synchronized: đồng bộ hóa, -- gọi nhiều nơi, cùng lúc (google)
     protected synchronized void buildGoogleApiClient() {
         // Khởi tạo, cấu hình một GoogleApiClient
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext).addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
     }
 
     // Gọi khi ứng dụng khởi động
@@ -272,8 +274,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, getActivity(), 9000).show();
-            } else {
-//                finish();
             }
             return false;
         }
@@ -292,13 +292,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         // check if map is created successfully or not
         if (mMap != null) {
             LatLng latLong = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(latLong).zoom(17f).build();
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLong)
+                    .zoom(17f)
+                    .build();
 
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            Toast.makeText(mContext, location.getLatitude() + " - " + location.getLongitude(), Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(mContext, "Sorry! unable to create maps", Toast.LENGTH_SHORT).show();
         }
@@ -319,13 +320,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         View alertLayout = inflater.inflate(R.layout.custom_dialog_check_gps, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setView(alertLayout);
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-        builder.setPositiveButton("OKAY!", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("CANCEL", null);
+        builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);

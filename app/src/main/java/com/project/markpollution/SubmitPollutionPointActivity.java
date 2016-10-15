@@ -22,16 +22,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Time: 11:22 AM
  */
 
-public class SubmitMarkPollutionActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SubmitPollutionPointActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_submit_markpollution);
+        setContentView(R.layout.activity_submit_pollution_point);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mapss);
+                .findFragmentById(R.id.mapSubmit);
 
         mapFragment.getMapAsync(this);
     }

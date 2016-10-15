@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initView();
 
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initView() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
         tabs = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 //        fab = (FloatingActionButton) findViewById(fab);
@@ -89,17 +89,17 @@ public class MainActivity extends AppCompatActivity
 //            case fab:
 ////                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
 ////                        .setAction("Action", null).show();
-////                Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+////                Intent i = new Intent(this, SubmitPollutionPointActivity.class);
 ////                i.putExtra("lat", latDemo);
 ////                i.putExtra("long", longitDemo);
 ////                startActivity(i);
 //
 //                if (viewPager.getCurrentItem() == 0) {
 //                    viewPager.setCurrentItem(1);
-//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+//                    Intent i = new Intent(this, SubmitPollutionPointActivity.class);
 //                    startActivity(i);
 //                }else {
-//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
+//                    Intent i = new Intent(this, SubmitPollutionPointActivity.class);
 //                    startActivity(i);
 //                }
 //                break;
