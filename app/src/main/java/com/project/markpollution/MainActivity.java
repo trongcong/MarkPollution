@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
 
         setupViewPager(viewPager);
         tabs.setupWithViewPager(viewPager);
-//        setupTabIcons();
+        setNavigationHeader();
     }
 
     private void initView() {
@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        setNavigationHeader();
     }
 
     private void setupViewPager(ViewPager viewPager) {
