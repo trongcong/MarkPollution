@@ -56,9 +56,9 @@ public class MapsAdapter implements GoogleMap.InfoWindowAdapter {
 
         for (LocationObj l : arrL) {
             if (l.getLatitude() == latLng.latitude & l.getLongitude() == latLng.longitude) {
-                tvTitle.setText(l.getTitle() + " Lat: " + l.getLatitude());
+                tvTitle.setText(l.getTitle());
                 Log.i("title", l.getTitle() + " Lat: " + l.getLatitude());
-                tvDes.setText(l.getDesc() + " Long: " + l.getLongitude());
+                tvDes.setText(l.getDesc() + "\nLat: " + l.getLatitude() + "\nLong: " + l.getLongitude());
                 Log.i("desc", l.getDesc() + " Long: " + l.getLongitude());
                 imgMaker.setImageResource(l.getImage());
                 Log.i("image", l.getImage() + "");

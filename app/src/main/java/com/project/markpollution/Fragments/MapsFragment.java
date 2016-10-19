@@ -34,8 +34,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 import com.project.markpollution.CustomAdapter.MapsAdapter;
+import com.project.markpollution.DetailReportActivity;
 import com.project.markpollution.ModelObject.LocationObj;
 import com.project.markpollution.R;
 import com.project.markpollution.SubmitMarkPollutionActivity;
@@ -53,7 +56,7 @@ import java.util.ArrayList;
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, View.OnClickListener {
+        LocationListener, View.OnClickListener, GoogleMap.OnInfoWindowClickListener {
 
     public ArrayList<LocationObj> listL;
 
@@ -63,6 +66,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private FloatingActionButton fabCheck;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
+    private ClusterManager<LocationObj> mClusterManager;
 
     public MapsFragment() {
     }
@@ -93,10 +97,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
-        mContext = getActivity();
         initView(rootView);
 
+        demoData();
+        return rootView;
+    }
 
+    private void initView(View rootView) {
+        mContext = getActivity();
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
+        imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
 
         if (checkPlayServices()) {
             if (!isLocationEnabled(mContext)) {
@@ -107,14 +118,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         } else {
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
-        demoData();
-        return rootView;
-    }
-
-    private void initView(View rootView) {
-        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
-        fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
-        imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
 
         imgGetLocation.setOnClickListener(this);
         mapFragment.getMapAsync(this);
@@ -125,10 +128,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabCheck:
-                Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
-                i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
-                i.putExtra("Long", mMap.getCameraPosition().target.longitude);
-                startActivity(i);
+                int click = 1;
+                if (click == 1) {
+                    imgGetLocation.setVisibility(View.VISIBLE);
+                    fabCheck.setImageResource(R.drawable.ic_check);
+                    click = 2;
+                }
+                if (click == 2) {
+                    Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
+                    i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
+                    i.putExtra("Long", mMap.getCameraPosition().target.longitude);
+                    startActivity(i);
+                    click = 1;
+                }
                 break;
             case R.id.imgGetLocation:
                 Toast.makeText(getContext(), mMap.getCameraPosition().target.latitude
@@ -140,6 +152,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        //Set Cluster on Maker
+        mClusterManager = new ClusterManager<LocationObj>(mContext, mMap);
+        mMap.setOnCameraIdleListener(mClusterManager);
+
         for (LocationObj l : listL) {
             setMaket(l);
         }
@@ -150,28 +167,54 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             Toast.makeText(mContext, "Ứng dụng chưa cấp quyền tìm vị trí !!!", Toast.LENGTH_LONG).show();
             return;
         }
+        mMap.setOnInfoWindowClickListener(this);
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setOnCameraIdleListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
-    void setMaket(LocationObj obj) {
+    private void setMaket(LocationObj obj) {
         LatLng sydney = new LatLng(obj.getLatitude(), obj.getLongitude());
         mMap.addMarker(new MarkerOptions().position(sydney));
         MapsAdapter mapsAdapter = new MapsAdapter(mContext, listL);
         mMap.setInfoWindowAdapter(mapsAdapter);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
 
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 17));
     }
 
-    void demoData() {
+    private void demoData() {
         listL = new ArrayList<>();
-        listL.add(new LocationObj("Title 1", "Description 1", R.drawable.admin, 21.027763544534345, 105.834158398211));
-        listL.add(new LocationObj("Title 2", "Description 2", R.drawable.add_marker, 21.027489088033935, 105.83488393574953));
-        listL.add(new LocationObj("Title 3", "Description 3", R.drawable.background_material, 21.027214005127888, 105.83561684936285));
-        listL.add(new LocationObj("Title 4", "Description 4", R.drawable.logout, 21.027931910985746, 105.83607684820892));
-        listL.add(new LocationObj("Title 5", "Description 5", R.drawable.ic_email_black, 21.02871709699915, 105.83497546613216));
+        listL.add(new LocationObj(0, "Title 1", "Description 1", R.drawable.admin,
+                21.027763544534345, 105.834158398211));
+        listL.add(new LocationObj(1, "Title 2", "Description 2", R.drawable.add_marker,
+                21.027489088033935, 105.83488393574953));
+        listL.add(new LocationObj(2, "Title 3", "Description 3", R.drawable.background_material,
+                21.027214005127888, 105.83561684936285));
+        listL.add(new LocationObj(3, "Title 4", "Description 4", R.drawable.logout,
+                21.027931910985746, 105.83607684820892));
+        listL.add(new LocationObj(4, "Title 5", "Description 5", R.drawable.ic_email_black,
+                21.02871709699915, 105.83497546613216));
+    }
+
+    // When Click inFoWindows
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Intent intent = new Intent(mContext, DetailReportActivity.class);
+        Bundle bundle = new Bundle();
+        LatLng latLng = marker.getPosition();
+        Log.i("latlg", latLng.latitude + " - " + latLng.longitude);
+        for (LocationObj l : listL) {
+            if (l.getLatitude() == latLng.latitude & l.getLongitude() == latLng.longitude) {
+                int a = l.getId_po();
+                Log.i("getId_po", a + " ");
+                LocationObj locationObj = listL.get(a);
+                bundle.putSerializable("ArrListObj", locationObj);
+                intent.putExtras(bundle);
+            }
+        }
+        Log.i("start", "ok");
+        startActivity(intent);
     }
 
     // Gọi khi người dùng có kết nối từ GoogleApiClient
@@ -312,7 +355,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         );
     }
 
-
     // Dialog yêu cầu kích hoạt GPS
     private void openDiaLogCheckGPS() {
         LayoutInflater inflater = getLayoutInflater(getArguments());
@@ -335,4 +377,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         builder.setCancelable(false);
         builder.create().show();
     }
+
+
 }

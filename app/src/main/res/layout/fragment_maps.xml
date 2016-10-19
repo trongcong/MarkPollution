@@ -28,7 +28,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="33sp"
                 android:contentDescription="@string/get_location_this"
-                android:src="@drawable/add_marker" />
+                android:src="@drawable/add_marker"
+                android:visibility="gone" />
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
@@ -37,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
             android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_check" />
+            android:src="@drawable/newreport" />
     </FrameLayout>
 
 </RelativeLayout>

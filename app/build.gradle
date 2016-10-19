@@ -39,4 +39,10 @@ dependencies {
 
     // Static maps api android
 //    compile 'com.github.renaudcerrato:static-maps-api:1.0.2'
+
+    //Add new
+    compile 'com.google.android.gms:play-services-auth:9.6.1'
+    compile 'nl.stevenhack.volley:library:1.0.2'
 }
+//Add new
+apply plugin: 'com.google.gms.google-services'

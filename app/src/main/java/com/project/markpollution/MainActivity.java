@@ -23,10 +23,10 @@ import com.project.markpollution.Fragments.NewsFeedFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
+    public ViewPager viewPager;
     ViewPagerAdapter adapter;
     private Toolbar toolbar;
     private TabLayout tabs;
-    public ViewPager viewPager;
 //    public FloatingActionButton fab;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -86,23 +86,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case fab:
-////                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-////                        .setAction("Action", null).show();
-////                Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
-////                i.putExtra("lat", latDemo);
-////                i.putExtra("long", longitDemo);
-////                startActivity(i);
-//
-//                if (viewPager.getCurrentItem() == 0) {
-//                    viewPager.setCurrentItem(1);
-//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
-//                    startActivity(i);
-//                }else {
-//                    Intent i = new Intent(this, SubmitMarkPollutionActivity.class);
-//                    startActivity(i);
-//                }
-//                break;
+
         }
     }
 

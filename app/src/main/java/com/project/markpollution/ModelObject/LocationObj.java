@@ -1,5 +1,10 @@
 package com.project.markpollution.ModelObject;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
+import java.io.Serializable;
+
 /**
  * IDE: Android Studio
  * Created by Nguyen Trong Cong  - 2DEV4U.COM
@@ -8,36 +13,26 @@ package com.project.markpollution.ModelObject;
  * Date: 10/8/2016
  * Time: 2:37 AM
  */
-public class LocationObj {
-    public double Latitude;
-    public double Longitude;
+public class LocationObj implements ClusterItem, Serializable {
+
+    double Latitude;
+    double Longitude;
+    int id_po;
     String title;
     String desc;
-    int id_po;
     int image;
 
+    LatLng mPosition;
 
-    public LocationObj(double Latitude, double Longitude) {
-        this.Latitude = Latitude;
-        this.Longitude = Longitude;
-    }
-
-    public LocationObj(String title, String desc, int image, double latitude, double longitude) {
-        this.title = title;
-        this.desc = desc;
-        this.image = image;
-        Longitude = longitude;
-        Latitude = latitude;
-    }
-
-    public LocationObj(double latitude, double longitude, String title, String desc, int id_po, int image) {
-        this.Latitude = latitude;
-        this.Longitude = longitude;
-        this.title = title;
-        this.desc = desc;
+    public LocationObj(int id_po, String title, String desc, int image, double latitude, double longitude) {
         this.id_po = id_po;
+        this.title = title;
+        this.desc = desc;
         this.image = image;
+        Latitude = latitude;
+        Longitude = longitude;
     }
+
 
     public double getLatitude() {
         return Latitude;
@@ -85,5 +80,10 @@ public class LocationObj {
 
     public void setImage(int image) {
         this.image = image;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return mPosition;
     }
 }
