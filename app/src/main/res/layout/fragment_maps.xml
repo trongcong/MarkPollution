@@ -6,7 +6,10 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
         <fragment
             android:id="@+id/map"
@@ -39,6 +42,15 @@
             android:layout_gravity="bottom|center"
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/newreport" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCheckSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_check"
+            android:visibility="gone" />
     </FrameLayout>
 
 </RelativeLayout>

@@ -63,7 +63,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     Context mContext;
     ImageView imgGetLocation;
     SupportMapFragment mapFragment;
-    private FloatingActionButton fabCheck;
+    private FloatingActionButton fabCheck, fabCheckSelect;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private ClusterManager<LocationObj> mClusterManager;
@@ -107,6 +107,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mContext = getActivity();
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         fabCheck = (FloatingActionButton) rootView.findViewById(R.id.fabCheck);
+        fabCheckSelect = (FloatingActionButton) rootView.findViewById(R.id.fabCheckSelect);
         imgGetLocation = (ImageView) rootView.findViewById(R.id.imgGetLocation);
 
         if (checkPlayServices()) {
@@ -122,25 +123,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         imgGetLocation.setOnClickListener(this);
         mapFragment.getMapAsync(this);
         fabCheck.setOnClickListener(this);
+        fabCheckSelect.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabCheck:
-                int click = 1;
-                if (click == 1) {
-                    imgGetLocation.setVisibility(View.VISIBLE);
-                    fabCheck.setImageResource(R.drawable.ic_check);
-                    click = 2;
-                }
-                if (click == 2) {
-                    Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
-                    i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
-                    i.putExtra("Long", mMap.getCameraPosition().target.longitude);
-                    startActivity(i);
-                    click = 1;
-                }
+                imgGetLocation.setVisibility(View.VISIBLE);
+                fabCheckSelect.setVisibility(View.VISIBLE);
+                fabCheck.setVisibility(View.GONE);
+                break;
+            case R.id.fabCheckSelect:
+                Intent i = new Intent(mContext, SubmitMarkPollutionActivity.class);
+                i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
+                i.putExtra("Long", mMap.getCameraPosition().target.longitude);
+                startActivity(i);
                 break;
             case R.id.imgGetLocation:
                 Toast.makeText(getContext(), mMap.getCameraPosition().target.latitude
@@ -213,7 +211,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 intent.putExtras(bundle);
             }
         }
-        Log.i("start", "ok");
+        Log.i("start", "ok - " + marker.getId() + " title " + marker.getTitle());
         startActivity(intent);
     }
 
