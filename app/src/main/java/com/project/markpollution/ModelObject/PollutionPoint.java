@@ -101,4 +101,9 @@ public class PollutionPoint {
     public void setTime(String time) {
         this.time = time;
     }
+
+    @Override
+    public String toString() {
+        return id+ "\t" +id_cate+ "\t" + id_user+ "\t" +lat+ "\t" +lng+ "\t" +title+ "\t" +desc+ "\t" +image+ "\t" +time;
+    }
 }

@@ -364,31 +364,4 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
             });
         }
     }
-
-//    private class GetPictureFromURL extends AsyncTask<String, Void, Bitmap>{
-//        ImageView iv;
-//
-//        public GetPictureFromURL(ImageView iv) {
-//            this.iv = iv;
-//        }
-//
-//        @Override
-//        protected Bitmap doInBackground(String... params) {
-//            String url = params[0];
-//            Bitmap bitmap = null;
-//            try {
-//                InputStream is = new URL(url).openStream();
-//                bitmap = BitmapFactory.decodeStream(is);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return bitmap;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Bitmap bitmap) {
-//            super.onPostExecute(bitmap);
-//            iv.setImageBitmap(bitmap);
-//        }
-//    }
 }

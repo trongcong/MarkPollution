@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -35,13 +36,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.project.markpollution.CustomAdapter.MapsAdapter;
-import com.project.markpollution.ModelObject.LocationObj;
+import com.project.markpollution.MainActivity;
+import com.project.markpollution.ModelObject.PollutionPoint;
 import com.project.markpollution.R;
 import com.project.markpollution.SubmitPollutionPointActivity;
+import com.project.markpollution.CustomAdapter.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * IDE: Android Studio
@@ -51,37 +54,23 @@ import java.util.ArrayList;
  * Date: 10/8/2016
  * Time: 1:47 AM
  */
-public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener,
+public class MapsFragment extends Fragment implements OnMapReadyCallback,
+        GoogleMap.OnCameraIdleListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, View.OnClickListener {
+        LocationListener, View.OnClickListener, GoogleMap.OnInfoWindowClickListener{
 
-    public ArrayList<LocationObj> listL;
-
-    Context mContext;
-    ImageView imgGetLocation;
-    SupportMapFragment mapFragment;
+    private Context mContext;
+    private ImageView imgGetLocation;
+    private SupportMapFragment mapFragment;
     private FloatingActionButton fabCheck;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
-    public MapsFragment() {
-    }
+    private HashMap<String, Uri> images = new HashMap<>();
+    PopupAdapter adapter;
 
-    public static boolean isLocationEnabled(Context context) {
-        int locationMode = 0;
-        String locationProviders;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-            } catch (Settings.SettingNotFoundException e) {
-                e.printStackTrace();
-            }
-            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-        } else {
-            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-            return !TextUtils.isEmpty(locationProviders);
-        }
+    public MapsFragment() {
     }
 
     @Override
@@ -106,7 +95,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         } else {
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
-        demoData();
+
+        // Fetch data from database and pass into List<>
+//        getAllPollutionPoint();
         return rootView;
     }
 
@@ -140,9 +131,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        for (LocationObj l : listL) {
-            setMarker(l);
+
+        // extract markers from List<> into Google Map
+        for(PollutionPoint po: MainActivity.listPo){
+            addMarker(googleMap, po);
         }
+
+        googleMap.setInfoWindowAdapter(new PopupAdapter(getContext(), LayoutInflater.from(getContext()), images));
+        googleMap.setOnInfoWindowClickListener(this);
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext,
@@ -150,28 +146,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             Toast.makeText(mContext, "Ứng dụng chưa cấp quyền tìm vị trí !!!", Toast.LENGTH_LONG).show();
             return;
         }
+
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setOnCameraIdleListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
-    void setMarker(LocationObj obj) {
-        LatLng point = new LatLng(obj.getLatitude(), obj.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(point));
-        MapsAdapter mapsAdapter = new MapsAdapter(mContext, listL);
-        mMap.setInfoWindowAdapter(mapsAdapter);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 17));
-
-    }
-
-    void demoData() {
-        listL = new ArrayList<>();
-        listL.add(new LocationObj("Title 1", "Description 1", R.drawable.admin, 21.027763544534345, 105.834158398211));
-        listL.add(new LocationObj("Title 2", "Description 2", R.drawable.add_marker, 21.027489088033935, 105.83488393574953));
-        listL.add(new LocationObj("Title 3", "Description 3", R.drawable.background_material, 21.027214005127888, 105.83561684936285));
-        listL.add(new LocationObj("Title 4", "Description 4", R.drawable.logout, 21.027931910985746, 105.83607684820892));
-        listL.add(new LocationObj("Title 5", "Description 5", R.drawable.ic_email_black, 21.02871709699915, 105.83497546613216));
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+            }
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+        } else {
+            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders);
+        }
     }
 
     // Gọi khi người dùng có kết nối từ GoogleApiClient
@@ -331,4 +326,30 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         builder.setCancelable(false);
         builder.create().show();
     }
+
+    private void addMarker(GoogleMap map, PollutionPoint po) {
+        Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(po.getLat(), po.getLng()))
+                .title(po.getTitle())
+                .snippet(po.getDesc()));
+
+        images.put(marker.getId(), Uri.parse(po.getImage()));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
+
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+    }
+
+
+//    private void setMarker(){
+//        for(PollutionPoint po: MainActivity.listPo){
+//            LatLng latLng = new LatLng(po.getLat(), po.getLng());
+//            mMap.addMarker(new MarkerOptions().position(latLng));
+//            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(mContext, MainActivity.listPo);
+//            mMap.setInfoWindowAdapter(adapter);
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+//        }
+//    }
 }

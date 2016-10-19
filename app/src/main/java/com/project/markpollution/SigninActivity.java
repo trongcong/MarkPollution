@@ -1,7 +1,9 @@
 package com.project.markpollution;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,14 +24,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.project.markpollution.Fragments.MapsFragment;
+import com.project.markpollution.ModelObject.PollutionPoint;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SigninActivity extends AppCompatActivity  implements GoogleApiClient.OnConnectionFailedListener {
     private GoogleApiClient googleApiClient;
+    private SignInButton signInButton;
     private String url_insert = "http://2dev4u.com/dev/markpollution/InsertUser.php";
     private String url_checkUser = "http://2dev4u.com/dev/markpollution/RetrieveUserByEmail.php?email=";
+
+    private String url_retrive_pollutionPoint = "http://2dev4u.com/dev/markpollution/RetrievePollutionPoint.php";
+    private ProgressDialog progressDialog;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +60,7 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
                 .enableAutoManage(this, this)
                 .build();
 
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setScopes(gso.getScopeArray());
         signInButton.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +69,9 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
                 signIn();
             }
         });
+        signInButton.setVisibility(View.INVISIBLE);
+
+        getAllPollutionPoint();
     }
 
     private void signIn() {
@@ -65,7 +82,7 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 111){
+        if(requestCode == 111 && resultCode == RESULT_OK){
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if(result.isSuccess()){
                 final GoogleSignInAccount acc = result.getSignInAccount();
@@ -76,23 +93,17 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
                     public void onResponse(String response) {
                         if(!response.equals("user doesn't exist")){
                             // Save id_user to SharedPreferences
-                            SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
-                            SharedPreferences.Editor edit = sharedPreferences.edit();
-                            edit.putString("sharedpref_id_user", response);
-                            edit.commit();
-
-                            Intent i = new Intent(SigninActivity.this, MainActivity.class);
-                            i.putExtra("name", acc.getDisplayName());
-                            i.putExtra("email", acc.getEmail());
-                            i.putExtra("avatar", acc.getPhotoUrl().toString());
-                            startActivity(i); finish();
+                          saveUserIDtoSharedPreferences(null, response, true);
+                            intent.putExtra("name", acc.getDisplayName());
+                            intent.putExtra("email", acc.getEmail());
+                            intent.putExtra("avatar", acc.getPhotoUrl().toString());
+                            startActivity(intent); finish();
                         }else{
                             insertUser(acc.getDisplayName(), acc.getEmail(), acc.getPhotoUrl().toString());
-                            Intent i = new Intent(SigninActivity.this, MainActivity.class);
-                            i.putExtra("name", acc.getDisplayName());
-                            i.putExtra("email", acc.getEmail());
-                            i.putExtra("avatar", acc.getPhotoUrl().toString());
-                            startActivity(i); finish();
+                            intent.putExtra("name", acc.getDisplayName());
+                            intent.putExtra("email", acc.getEmail());
+                            intent.putExtra("avatar", acc.getPhotoUrl().toString());
+                            startActivity(intent); finish();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -110,24 +121,31 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
         }
     }
 
-    private void saveUserIDtoSharedPreferences(String email){
-        String urlCheck = url_checkUser + email;
-        StringRequest stringReq = new StringRequest(Request.Method.GET, urlCheck, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
-                SharedPreferences.Editor edit = sharedPreferences.edit();
-                edit.putString("sharedpref_id_user", response);
-                edit.commit();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void saveUserIDtoSharedPreferences(String email, final String id_user, boolean isUserExist){
+        if(isUserExist){
+            SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+            SharedPreferences.Editor edit = sharedPreferences.edit();
+            edit.putString("sharedpref_id_user", id_user);
+            edit.commit();
+        }else{
+            String urlCheck = url_checkUser + email;
+            StringRequest stringReq = new StringRequest(Request.Method.GET, urlCheck, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+                    SharedPreferences.Editor edit = sharedPreferences.edit();
+                    edit.putString("sharedpref_id_user", response);
+                    edit.commit();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        Volley.newRequestQueue(this).add(stringReq);
+            Volley.newRequestQueue(this).add(stringReq);
+        }
     }
 
     private void insertUser(final String name, final String email, final String avatar){
@@ -136,7 +154,7 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
             public void onResponse(String response) {
                 if(response.equals("insert success")){
                     Toast.makeText(SigninActivity.this, "Account has registered successful", Toast.LENGTH_SHORT).show();
-                    saveUserIDtoSharedPreferences(email);
+                    saveUserIDtoSharedPreferences(email,null, false);
                 }
             }
         }, new Response.ErrorListener() {
@@ -164,5 +182,23 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    private void getAllPollutionPoint(){
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url_retrive_pollutionPoint, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                intent = new Intent(SigninActivity.this, MainActivity.class);
+                intent.putExtra("po_data", response);
+//                progressDialog.dismiss();
+                signInButton.setVisibility(View.VISIBLE);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(SigninActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 }

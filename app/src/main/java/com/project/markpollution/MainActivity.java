@@ -21,17 +21,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.project.markpollution.CustomAdapter.ViewPagerAdapter;
 import com.project.markpollution.Fragments.MapsFragment;
 import com.project.markpollution.Fragments.NewsFeedFragment;
+import com.project.markpollution.ModelObject.PollutionPoint;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     ViewPagerAdapter adapter;
     private Toolbar toolbar;
@@ -39,6 +50,8 @@ public class MainActivity extends AppCompatActivity
     public ViewPager viewPager;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
+
+    public static ArrayList<PollutionPoint> listPo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         setupViewPager(viewPager);
         tabs.setupWithViewPager(viewPager);
         setNavigationHeader();
+        fetchData();
     }
 
     private void initView() {
@@ -74,7 +88,6 @@ public class MainActivity extends AppCompatActivity
         adapter.addFragment(new NewsFeedFragment(), "NEWS FEED");
         adapter.addFragment(new MapsFragment(), "MAPS");
         viewPager.setAdapter(adapter);
-        //====================================================== TODO: ====================
         viewPager.requestTransparentRegion(viewPager);
     }
 
@@ -129,26 +142,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-//            case fab:
-////                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-////                        .setAction("Action", null).show();
-////                Intent i = new Intent(this, SubmitPollutionPointActivity.class);
-////                i.putExtra("lat", latDemo);
-////                i.putExtra("long", longitDemo);
-////                startActivity(i);
-//
-//                if (viewPager.getCurrentItem() == 0) {
-//                    viewPager.setCurrentItem(1);
-//                    Intent i = new Intent(this, SubmitPollutionPointActivity.class);
-//                    startActivity(i);
-//                }else {
-//                    Intent i = new Intent(this, SubmitPollutionPointActivity.class);
-//                    startActivity(i);
-//                }
-//                break;
+    private void fetchData(){
+        Intent intent = getIntent();
+        String po_data = intent.getStringExtra("po_data");
+        try {
+            JSONObject jObj = new JSONObject(po_data);
+            JSONArray arr = jObj.getJSONArray("result");
+            listPo = new ArrayList<>();
+            for(int i=0; i<arr.length(); i++){
+                JSONObject po = arr.getJSONObject(i);
+                String id_po = po.getString("id_po");
+                String id_cate = po.getString("id_cate");
+                String id_user = po.getString("id_user");
+                double lat = po.getDouble("lat");
+                double lng = po.getDouble("lng");
+                String title = po.getString("title");
+                String desc = po.getString("desc");
+                String image = po.getString("image");
+                String time = po.getString("time");
+
+                listPo.add(new PollutionPoint(id_po, id_cate, id_user, lat, lng, title, desc, image, time));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
