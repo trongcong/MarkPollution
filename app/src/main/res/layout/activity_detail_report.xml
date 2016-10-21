@@ -149,5 +149,16 @@
             android:background="@color/colorPrimary"
             android:textColor="@color/cast_libraries_material_featurehighlight_text_body_color" />
 
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/listViewComment"
+            android:id="@+id/editTextComment"
+            android:hint="type your comment here..."/>
+
     </RelativeLayout>
 </ScrollView>

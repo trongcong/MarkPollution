@@ -42,7 +42,7 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
     private String url_checkUser = "http://2dev4u.com/dev/markpollution/RetrieveUserByEmail.php?email=";
 
     private String url_retrive_pollutionPoint = "http://2dev4u.com/dev/markpollution/RetrievePollutionPoint.php";
-    private ProgressDialog progressDialog;
+//    private ProgressDialog progressDialog;
     private Intent intent;
 
     @Override
@@ -82,7 +82,7 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 111 && resultCode == RESULT_OK){
+        if(requestCode == 111){
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if(result.isSuccess()){
                 final GoogleSignInAccount acc = result.getSignInAccount();
@@ -115,9 +115,9 @@ public class SigninActivity extends AppCompatActivity  implements GoogleApiClien
 
                 Volley.newRequestQueue(this).add(stringReq);
 
+            }else {
+                Toast.makeText(this, result.getStatus().toString(), Toast.LENGTH_SHORT).show();
             }
-        }else{
-            Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
         }
     }
 
