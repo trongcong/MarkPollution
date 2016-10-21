@@ -21,7 +21,7 @@ import java.util.HashMap;
  * Created by Hung on 19-Oct-16.
  */
 
-public class PopupAdapter implements GoogleMap.InfoWindowAdapter {
+public class PopupInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private View view = null;
     private LayoutInflater inflater = null;
     private HashMap<String, Uri> images = null;
@@ -30,7 +30,7 @@ public class PopupAdapter implements GoogleMap.InfoWindowAdapter {
     private int iconHeight=-1;
     private Marker lastMarker = null;
 
-    public PopupAdapter(Context ctxt, LayoutInflater inflater, HashMap<String, Uri> images) {
+    public PopupInfoWindowAdapter(Context ctxt, LayoutInflater inflater, HashMap<String, Uri> images) {
         this.ctxt = ctxt;
         this.inflater = inflater;
         this.images = images;
@@ -65,8 +65,9 @@ public class PopupAdapter implements GoogleMap.InfoWindowAdapter {
 
 
             Picasso.with(ctxt).load(image).resize(iconWidth,iconHeight)
-                    .centerCrop().noFade()
+                    .noFade()
                     .placeholder(R.drawable.placeholder)
+                    .centerCrop()
                     .into(icon, new MarkerCallback(marker));
         }
 

@@ -8,15 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,7 +25,6 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -38,7 +33,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,13 +48,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -72,7 +63,7 @@ import java.util.Map;
  * Time: 11:22 AM
  */
 
-public class SubmitPollutionPointActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
+public class SendReportActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
     private GoogleMap mMap;
     private double lat, lng;
     private EditText etTitle, etDesc;
@@ -90,7 +81,7 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_submit_pollution_point);
+        setContentView(R.layout.activity_send_report);
         // reference to map fragment then get async from it
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapSubmit);
@@ -137,7 +128,7 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
         ivCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new Dialog(SubmitPollutionPointActivity.this);
+                final Dialog dialog = new Dialog(SendReportActivity.this);
                 dialog.setContentView(R.layout.dialog_choose_media);
                 dialog.setTitle("Select option:");
                 dialog.show();
@@ -276,13 +267,13 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
                     e.printStackTrace();
                 }
 
-                ArrayAdapter<Category> adapter = new ArrayAdapter<>(SubmitPollutionPointActivity.this, android.R.layout.simple_list_item_1, listCate);
+                ArrayAdapter<Category> adapter = new ArrayAdapter<>(SendReportActivity.this, android.R.layout.simple_list_item_1, listCate);
                 spCate.setAdapter(adapter);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SubmitPollutionPointActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SendReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -324,7 +315,7 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(SubmitPollutionPointActivity.this, "Upload image failure", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SendReportActivity.this, "Upload image failure", Toast.LENGTH_SHORT).show();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -334,13 +325,13 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
                     StringRequest strReq = new StringRequest(Request.Method.POST, url_insert_pollutionPoint, new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Toast.makeText(SubmitPollutionPointActivity.this, response, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SendReportActivity.this, response, Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(SubmitPollutionPointActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SendReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }){
@@ -358,7 +349,7 @@ public class SubmitPollutionPointActivity extends AppCompatActivity implements O
                         }
                     };
 
-                    Volley.newRequestQueue(SubmitPollutionPointActivity.this).add(strReq);
+                    Volley.newRequestQueue(SendReportActivity.this).add(strReq);
 
                 }
             });

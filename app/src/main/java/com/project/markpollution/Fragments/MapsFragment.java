@@ -38,10 +38,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.project.markpollution.DetailReportActivity;
 import com.project.markpollution.MainActivity;
 import com.project.markpollution.ModelObject.PollutionPoint;
 import com.project.markpollution.R;
-import com.project.markpollution.SubmitPollutionPointActivity;
+import com.project.markpollution.SendReportActivity;
 import com.project.markpollution.CustomAdapter.*;
 
 import java.util.HashMap;
@@ -58,7 +59,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnCameraIdleListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, View.OnClickListener, GoogleMap.OnInfoWindowClickListener{
+        LocationListener, View.OnClickListener,
+        GoogleMap.OnInfoWindowClickListener{
 
     private Context mContext;
     private ImageView imgGetLocation;
@@ -66,9 +68,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
     private FloatingActionButton fabCheck;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-
     private HashMap<String, Uri> images = new HashMap<>();
-    PopupAdapter adapter;
 
     public MapsFragment() {
     }
@@ -96,8 +96,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             Toast.makeText(mContext, "Location not supported in this device", Toast.LENGTH_SHORT).show();
         }
 
-        // Fetch data from database and pass into List<>
-//        getAllPollutionPoint();
         return rootView;
     }
 
@@ -118,7 +116,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
                         .setAction("OK", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent i = new Intent(mContext, SubmitPollutionPointActivity.class);
+                                Intent i = new Intent(mContext, SendReportActivity.class);
                                 i.putExtra("Lat", mMap.getCameraPosition().target.latitude);
                                 i.putExtra("Long", mMap.getCameraPosition().target.longitude);
                                 startActivity(i);
@@ -137,7 +135,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
             addMarker(googleMap, po);
         }
 
-        googleMap.setInfoWindowAdapter(new PopupAdapter(getContext(), LayoutInflater.from(getContext()), images));
+        googleMap.setInfoWindowAdapter(new PopupInfoWindowAdapter(getContext(), LayoutInflater.from(getContext()), images));
         googleMap.setOnInfoWindowClickListener(this);
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -331,6 +329,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
         Marker marker = map.addMarker(new MarkerOptions().position(new LatLng(po.getLat(), po.getLng()))
                 .title(po.getTitle())
                 .snippet(po.getDesc()));
+        marker.setTag(po.getId());
 
         images.put(marker.getId(), Uri.parse(po.getImage()));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
@@ -339,17 +338,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
+        Intent intent = new Intent(getActivity(), DetailReportActivity.class);
+        intent.putExtra("id_po", marker.getTag().toString());
+        startActivity(intent);
+
 
     }
-
-
-//    private void setMarker(){
-//        for(PollutionPoint po: MainActivity.listPo){
-//            LatLng latLng = new LatLng(po.getLat(), po.getLng());
-//            mMap.addMarker(new MarkerOptions().position(latLng));
-//            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(mContext, MainActivity.listPo);
-//            mMap.setInfoWindowAdapter(adapter);
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-//        }
-//    }
 }
