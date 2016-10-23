@@ -40,7 +40,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.project.markpollution.ModelObject.Category;
+import com.project.markpollution.Objects.Category;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -129,7 +129,7 @@ public class SendReportActivity extends AppCompatActivity implements OnMapReadyC
             @Override
             public void onClick(View v) {
                 final Dialog dialog = new Dialog(SendReportActivity.this);
-                dialog.setContentView(R.layout.dialog_choose_media);
+                dialog.setContentView(R.layout.custom_dialog_choose_media);
                 dialog.setTitle("Select option:");
                 dialog.show();
 

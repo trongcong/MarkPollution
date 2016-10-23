@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.markpollution.DetailReportActivity;
 import com.project.markpollution.MainActivity;
-import com.project.markpollution.ModelObject.PollutionPoint;
+import com.project.markpollution.Objects.PollutionPoint;
 import com.project.markpollution.R;
 import com.project.markpollution.SendReportActivity;
 import com.project.markpollution.CustomAdapter.*;

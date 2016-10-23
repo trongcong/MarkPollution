@@ -21,15 +21,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.project.markpollution.CustomAdapter.ViewPagerAdapter;
 import com.project.markpollution.Fragments.MapsFragment;
 import com.project.markpollution.Fragments.NewsFeedFragment;
-import com.project.markpollution.ModelObject.PollutionPoint;
+import com.project.markpollution.Objects.PollutionPoint;
 
 import org.json.JSONArray;
 import org.json.JSONException;

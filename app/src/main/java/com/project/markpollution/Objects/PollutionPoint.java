@@ -1,4 +1,4 @@
-package com.project.markpollution.ModelObject;
+package com.project.markpollution.Objects;
 
 /**
  * Created by Hung on 17-Oct-16.

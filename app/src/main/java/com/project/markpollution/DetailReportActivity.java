@@ -1,18 +1,25 @@
 package com.project.markpollution;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,7 +28,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.project.markpollution.CustomAdapter.CircleTransform;
-import com.project.markpollution.ModelObject.PollutionPoint;
+import com.project.markpollution.CustomAdapter.CommentRecyclerViewAdapter;
+import com.project.markpollution.Objects.Comment;
+import com.project.markpollution.Objects.PollutionPoint;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -30,17 +39,26 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DetailReportActivity extends AppCompatActivity implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
-    private ImageView ivPicture, ivAvatar, ivSpam, ivResolved;
+    private ImageView ivPicture, ivAvatar, ivSpam, ivResolved, ivSendComment;
     private RatingBar ratingBar;
     private TextView tvTitle, tvDesc, tvRate, tvTime, tvEmail, tvCate;
-    private ListView lvComment;
+    private EditText etComment;
+    private RecyclerView recyclerViewComment;
     private String url_RetrieveUserById = "http://2dev4u.com/dev/markpollution/RetrieveUserById.php?id_user=";
+    private String url_InsertComment = "http://2dev4u.com/dev/markpollution/InsertComment.php";
+    private String url_RetrieveCommentById = "http://2dev4u.com/dev/markpollution/RetrieveCommentById.php?id_po=";
     private GoogleMap gMap;
     private double lat, lng;
+    private String id_po;
+    private List<Comment> listComment = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +67,8 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
 
         initView();
         getPoInfo();
+        sendComment();
+        retrieveComments();
     }
 
     private void initView() {
@@ -57,6 +77,7 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         ivAvatar = (ImageView) findViewById(R.id.imageViewAvatarDetail);
         ivSpam = (ImageView) findViewById(R.id.imageViewSpam);
         ivResolved = (ImageView) findViewById(R.id.imageViewResolved);
+        ivSendComment = (ImageView) findViewById(R.id.imageViewSendComment);
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tvTitle = (TextView) findViewById(R.id.textViewTitleDetail);
         tvDesc = (TextView) findViewById(R.id.textViewDescDetail);
@@ -64,14 +85,15 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         tvTime = (TextView) findViewById(R.id.textViewTimeDetail);
         tvEmail = (TextView) findViewById(R.id.textViewEmailDetail);
         tvCate = (TextView) findViewById(R.id.textViewCategoryDetail);
-        lvComment = (ListView) findViewById(R.id.listViewComment);
+        etComment = (EditText) findViewById(R.id.editTextComment);
+        recyclerViewComment = (RecyclerView) findViewById(R.id.recyclerViewComment);
 
         mapFragment.getMapAsync(this);
     }
 
     private void getPoInfo() {
         Intent intent = getIntent();
-        String id_po = intent.getStringExtra("id_po");
+        id_po = intent.getStringExtra("id_po");
 
         String id_user = "";
         String id_cate = "";
@@ -128,13 +150,15 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    JSONArray arr = response.getJSONArray("result");
-                    JSONObject user = arr.getJSONObject(0);
-                    String email = user.getString("email");
-                    String avatar = user.getString("avatar");
+                    if(response.getString("status").equals("success")){
+                        JSONArray arr = response.getJSONArray("response");
+                        JSONObject user = arr.getJSONObject(0);
+                        String email = user.getString("email");
+                        String avatar = user.getString("avatar");
 
-                    tvEmail.setText(email);
-                    Picasso.with(DetailReportActivity.this).load(Uri.parse(avatar)).resize(100,100).transform(new CircleTransform()).into(ivAvatar);
+                        tvEmail.setText(email);
+                        Picasso.with(DetailReportActivity.this).load(Uri.parse(avatar)).resize(70,70).transform(new CircleTransform()).into(ivAvatar);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -181,6 +205,77 @@ public class DetailReportActivity extends AppCompatActivity implements OnMapRead
         gMap.addMarker(new MarkerOptions().position(point));
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 16));
         gMap.getUiSettings().setMapToolbarEnabled(false);
-//        gMap.getUiSettings().setAllGesturesEnabled(false);
+    }
+
+    private void sendComment() {
+        ivSendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!etComment.getText().toString().isEmpty()){
+                    StringRequest stringReq = new StringRequest(Request.Method.POST, url_InsertComment, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(DetailReportActivity.this, response, Toast.LENGTH_SHORT).show();
+                            etComment.setText(null);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                            etComment.setText(null);
+                        }
+                    }){
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            HashMap<String, String> params = new HashMap<>();
+                            params.put("id_po", id_po);
+                            params.put("id_user", getUserID());
+                            params.put("comment", etComment.getText().toString());
+                            return params;
+                        }
+                    };
+
+                    Volley.newRequestQueue(DetailReportActivity.this).add(stringReq);
+                }
+            }
+        });
+    }
+
+    private String getUserID(){
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedpref_id_user",MODE_PRIVATE);
+        return sharedPreferences.getString("sharedpref_id_user","");
+    }
+
+    private void retrieveComments(){
+        JsonObjectRequest objReq = new JsonObjectRequest(Request.Method.GET, url_RetrieveCommentById + id_po, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if(response.getString("status").equals("success")){
+                        JSONArray arr = response.getJSONArray("response");
+                        for(int i=0; i<arr.length(); i++){
+                            JSONObject comment = arr.getJSONObject(i);
+                            listComment.add(new Comment(comment.getString("id_po"), comment.getString("id_user"), comment.getString("comment"), comment.getString("time")));
+                            loadComments();
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(DetailReportActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Volley.newRequestQueue(this).add(objReq);
+    }
+
+    private void loadComments(){
+        LinearLayoutManager layout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerViewComment.setLayoutManager(layout);
+        recyclerViewComment.setAdapter(new CommentRecyclerViewAdapter(this, listComment));
     }
 }
