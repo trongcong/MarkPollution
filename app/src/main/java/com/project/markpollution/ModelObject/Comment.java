@@ -1,0 +1,69 @@
+package com.project.markpollution.ModelObject;
+
+/**
+ * IDE: Android Studio
+ * Created by Nguyen Trong Cong  - 2DEV4U.COM
+ * Name packge: com.project.markpollution.ModelObject
+ * Name project: MarkPollution
+ * Date: 10/24/2016
+ * Time: 6:33 AM
+ */
+
+public class Comment {
+    private String id_po;
+    private String id_user;
+    private String comment;
+    private String time;
+
+    public Comment() {
+    }
+
+    public Comment(String id_po, String id_user, String comment, String time) {
+        this.id_po = id_po;
+        this.id_user = id_user;
+        this.comment = comment;
+        this.time = time;
+    }
+
+    public String getId_po() {
+        return id_po;
+    }
+
+    public void setId_po(String id_po) {
+        this.id_po = id_po;
+    }
+
+    public String getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(String id_user) {
+        this.id_user = id_user;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id_po='" + id_po + '\'' +
+                ", id_user='" + id_user + '\'' +
+                ", comment='" + comment + '\'' +
+                ", time='" + time + '\'' +
+                '}';
+    }
+}

@@ -4,12 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <Spinner
+        android:id="@+id/spnPhanLoai"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:prompt="@string/loai_o_nhiem"
+        android:spinnerMode="dialog"></Spinner>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true">
+        android:layout_below="@+id/spnPhanLoai">
 
         <fragment
             android:id="@+id/map"
@@ -23,34 +28,39 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_centerInParent="true">
 
             <ImageView
                 android:id="@+id/imgGetLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="33sp"
+                android:layout_marginBottom="37sp"
                 android:contentDescription="@string/get_location_this"
                 android:src="@drawable/add_marker"
                 android:visibility="gone" />
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/newreport" />
-
-        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabCheckSelect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="bottom|center"
-            android:layout_margin="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
             android:src="@drawable/ic_check"
             android:visibility="gone" />
-    </FrameLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:src="@drawable/newreport" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

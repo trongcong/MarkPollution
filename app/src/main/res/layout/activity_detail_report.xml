@@ -4,101 +4,184 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context="com.project.markpollution.DetailReportActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:background="#FFF"
+        android:layout_margin="5sp"
         android:orientation="vertical"
         android:weightSum="10">
+
+        <fragment
+            android:id="@+id/mapDetail"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            maps:mapType="normal" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:fillViewport="true"
+            android:layout_weight="2"
             android:orientation="horizontal"
-            android:weightSum="2">
-
-            <fragment
-                android:id="@+id/mapsDetail"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                maps:mapType="normal"
-                tools:ignore="NestedWeights" />
+            android:weightSum="10">
 
             <ImageView
-                android:id="@+id/imgDetail"
+                android:id="@+id/imageViewDetail"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="Image Select"
+                android:layout_weight="3"
                 android:src="@mipmap/ic_launcher" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="7">
+
+                <TextView
+                    android:id="@+id/textViewTimeDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="hh:mm:ss dd/MM/yyyy" />
+
+                <TextView
+                    android:id="@+id/textViewEmailDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/textViewTimeDetail"
+                    android:text="user@gmail.com" />
+
+                <ImageView
+                    android:id="@+id/imageViewAvatarDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/textViewTimeDetail"
+                    android:layout_toLeftOf="@+id/textViewTimeDetail"
+                    android:layout_toStartOf="@+id/textViewTimeDetail"
+                    android:src="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:id="@+id/imageViewSpam"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/textViewEmailDetail"
+                    android:src="@drawable/ic_spam" />
+
+                <ImageView
+                    android:id="@+id/imageViewResolved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/textViewRateDetail"
+                    android:layout_alignStart="@+id/textViewRateDetail"
+                    android:layout_below="@+id/textViewEmailDetail"
+                    android:src="@drawable/ic_has_resolved" />
+
+                <TextView
+                    android:id="@+id/textViewRateDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/imageViewAvatarDetail"
+                    android:gravity="center"
+                    android:text="999 rated"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="normal|italic" />
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    style="@style/Widget.AppCompat.RatingBar.Indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toLeftOf="@+id/textViewRateDetail"
+                    android:layout_toStartOf="@+id/textViewRateDetail"
+                    android:numStars="5"
+                    android:rating="3"
+                    android:stepSize="1.0"
+                    android:theme="@style/RatingBar" />
+            </RelativeLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_weight="5"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/textViewTitleDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="title"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="5dp"
+                android:text="This is report title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="normal|bold" />
 
             <TextView
-                android:id="@+id/tvDes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:text="Des" />
-
-            <RatingBar
-                android:id="@+id/ratingBarDetail"
+                android:id="@+id/textViewCategoryDetail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:numStars="5"
-                android:rating="3.0"
-                android:stepSize="1.0"
-                android:theme="@style/RatingBar" />
+                android:layout_gravity="right"
+                android:layout_margin="2dp"
+                android:background="@color/colorPrimary"
+                android:text="Thermal Pollution"
+                android:textColor="@color/cast_libraries_material_featurehighlight_text_body_color"
+                android:textStyle="normal|bold|italic" />
+
+            <TextView
+                android:id="@+id/textViewDescDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewTitleDetail"
+                android:text="This is report's description This is report's description This is report's description This is report's description This is report's description This is report's description" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <CheckBox
-                    android:id="@+id/cbHasResloved"
+                <EditText
+                    android:id="@+id/editTextComment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Has resloved" />
+                    android:layout_marginTop="2dp"
+                    android:layout_toLeftOf="@+id/imageViewSendComment"
+                    android:layout_weight="1.8"
+                    android:hint="type your comment here..."
+                    android:inputType="textPersonName" />
 
-                <CheckBox
-                    android:id="@+id/cbSpam"
+                <ImageView
+                    android:id="@+id/imageViewSendComment"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Spam" />
-
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/recyclerViewComment"
+                    android:layout_weight="0.2"
+                    maps:srcCompat="@drawable/ic_send" />
             </LinearLayout>
 
-            <ListView
-                android:id="@+id/lvComment"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerViewComment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
+                android:layout_height="match_parent"
+                android:layout_below="@+id/textViewCategoryDetail"
+                android:layout_marginTop="8dp" />
         </LinearLayout>
     </LinearLayout>
+
+
 </ScrollView>

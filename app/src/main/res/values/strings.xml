@@ -27,4 +27,5 @@
     <string name="enter_description">Enter Description</string>
     <string name="enter_title">Enter title</string>
     <string name="imageview">ImageView</string>
+    <string name="loai_o_nhiem">Loại ô nhiễm</string>
 </resources>
